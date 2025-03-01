@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAnalysisHistory } from '../utils/analysisUtils';
-import { Clock, ChevronRight } from 'lucide-react';
+import { Clock, ChevronRight, Calendar, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HistoryItem {
   id: string;
   title: string;
+  content: string;
+  source: string | null;
+  author: string | null;
+  date: string | null;
   created_at: string;
   analysis_results: {
     id: string;
@@ -21,6 +26,7 @@ interface HistoryListProps {
 const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -42,6 +48,12 @@ const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const handleViewAnalysis = (articleId: string, analysisId: string) => {
+    // In a future implementation, this would navigate to a detailed view
+    // navigate(`/analysis/${analysisId}`);
+    console.log(`Viewing analysis ${analysisId} for article ${articleId}`);
   };
 
   if (loading) {
@@ -66,15 +78,28 @@ const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Your Analysis History</h2>
-      
       <div className="space-y-4">
         {history.map((item) => (
-          <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+          <div 
+            key={item.id} 
+            className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => item.analysis_results?.[0] && handleViewAnalysis(item.id, item.analysis_results[0].id)}
+          >
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold text-lg text-gray-800">{item.title}</h3>
-                <p className="text-sm text-gray-500 mt-1">Analyzed on {formatDate(item.created_at)}</p>
+                <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
+                  <span className="flex items-center">
+                    <Calendar size={14} className="mr-1" />
+                    Analyzed on {formatDate(item.created_at)}
+                  </span>
+                  {item.source && (
+                    <span className="flex items-center">
+                      <FileText size={14} className="mr-1" />
+                      {item.source}
+                    </span>
+                  )}
+                </div>
               </div>
               <ChevronRight className="text-gray-400" />
             </div>
@@ -101,6 +126,9 @@ const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
                     </div>
                   </div>
                 </div>
+                <p className="text-sm text-gray-600 mt-3 line-clamp-2">
+                  {item.analysis_results[0].summary}
+                </p>
               </div>
             )}
           </div>

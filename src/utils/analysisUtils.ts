@@ -718,6 +718,10 @@ export const fetchAnalysisHistory = async (userId: string) => {
       .select(`
         id,
         title,
+        content,
+        source,
+        author,
+        date,
         created_at,
         analysis_results (
           id,

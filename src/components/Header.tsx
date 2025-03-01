@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Search, LogOut } from 'lucide-react';
+import { AlertTriangle, Search, LogOut, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface HeaderProps {
@@ -20,6 +20,12 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated, onSignOut }) => {
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/about" className="hover:text-blue-200 transition-colors hidden md:inline">About</Link>
+            {isAuthenticated && (
+              <Link to="/history" className="flex items-center text-white hover:text-blue-200 transition-colors">
+                <History size={18} className="mr-1" />
+                <span>History</span>
+              </Link>
+            )}
             {isAuthenticated && onSignOut && (
               <button 
                 onClick={onSignOut}

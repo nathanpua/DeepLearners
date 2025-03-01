@@ -6,6 +6,7 @@ import ArticleInput from './components/ArticleInput';
 import AnalysisResults from './components/AnalysisResults';
 import Auth from './components/Auth';
 import About from './pages/about';
+import History from './pages/History';
 import { Article, AnalysisResult } from './types';
 import { analyzeArticle } from './utils/analysisUtils';
 import { supabase } from './lib/supabase';
@@ -187,6 +188,12 @@ function App() {
             />
           } />
           <Route path="/about" element={<About />} />
+          <Route path="/history" element={
+            <History 
+              isAuthenticated={isAuthenticated} 
+              userId={userId} 
+            />
+          } />
         </Routes>
       </main>
       
