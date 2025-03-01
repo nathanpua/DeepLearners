@@ -6,7 +6,7 @@ import ArticleInput from './components/ArticleInput';
 import AnalysisResults from './components/AnalysisResults';
 import Auth from './components/Auth';
 import About from './pages/about';
-import History from './pages/History';
+import History from './pages/History.tsx';
 import { Article, AnalysisResult } from './types';
 import { analyzeArticle } from './utils/analysisUtils';
 import { supabase } from './lib/supabase';
