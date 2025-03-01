@@ -4,6 +4,9 @@ import Footer from './components/Footer';
 import ArticleInput from './components/ArticleInput';
 import AnalysisResults from './components/AnalysisResults';
 import Auth from './components/Auth';
+import ResourcesPage from './pages/ResourcesPage';
+import FAQPage from './pages/FAQPage';
+import AboutPage from './pages/AboutPage';
 import { Article, AnalysisResult } from './types';
 import { analyzeArticle } from './utils/analysisUtils';
 import { supabase } from './lib/supabase';
@@ -14,6 +17,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<string>('home');
 
   useEffect(() => {
     // Check for existing session on load
@@ -106,6 +110,14 @@ function App() {
     setResults(null);
   };
 
+  const navigateTo = (page: string) => {
+    setCurrentPage(page);
+    // Reset analysis results when navigating away from home
+    if (page !== 'home') {
+      setResults(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -118,21 +130,28 @@ function App() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header isAuthenticated={isAuthenticated} onSignOut={handleSignOut} />
-      
-      <main className="container mx-auto px-4 flex-grow">
-        {!isAuthenticated ? (
-          <Auth onAuthChange={(status) => setIsAuthenticated(status)} />
-        ) : isAnalyzing ? (
+  const renderContent = () => {
+    if (currentPage === 'resources') {
+      return <ResourcesPage />;
+    } else if (currentPage === 'faq') {
+      return <FAQPage />;
+    } else if (currentPage === 'about') {
+      return <AboutPage />;
+    } else {
+      // Home page content
+      if (!isAuthenticated) {
+        return <Auth onAuthChange={(status) => setIsAuthenticated(status)} />;
+      } else if (isAnalyzing) {
+        return (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p className="text-lg text-gray-700">Analyzing article for bias and misinformation...</p>
           </div>
-        ) : results ? (
-          <AnalysisResults results={results} onReset={handleReset} />
-        ) : (
+        );
+      } else if (results) {
+        return <AnalysisResults results={results} onReset={handleReset} />;
+      } else {
+        return (
           <>
             <div className="max-w-3xl mx-auto mb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">How It Works</h2>
@@ -159,10 +178,25 @@ function App() {
               <ArticleInput onAnalyze={handleAnalyze} />
             </div>
           </>
-        )}
+        );
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <Header 
+        isAuthenticated={isAuthenticated} 
+        onSignOut={handleSignOut} 
+        currentPage={currentPage}
+        onNavigate={navigateTo}
+      />
+      
+      <main className="container mx-auto px-4 flex-grow">
+        {renderContent()}
       </main>
       
-      <Footer />
+      <Footer onNavigate={navigateTo} />
     </div>
   );
 }

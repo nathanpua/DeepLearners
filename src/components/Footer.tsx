@@ -1,21 +1,34 @@
 import React from 'react';
 import { AlertTriangle, Github, Twitter } from 'lucide-react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigate?: (page: string) => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const handleNavigation = (page: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(page);
+    }
+  };
+
   return (
     <footer className="bg-gray-800 text-white py-8 px-4 mt-12">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <div className="flex items-center mb-4 md:mb-0">
-            <AlertTriangle size={24} className="mr-2" />
-            <span className="text-xl font-bold">BiasDetector</span>
+            <a href="#" onClick={handleNavigation('home')} className="flex items-center">
+              <AlertTriangle size={24} className="mr-2" />
+              <span className="text-xl font-bold">BiasDetector</span>
+            </a>
           </div>
           
           <div className="flex space-x-4">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            <a href="https://github.com" className="text-gray-300 hover:text-white transition-colors">
               <Github size={20} />
             </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            <a href="https://twitter.com" className="text-gray-300 hover:text-white transition-colors">
               <Twitter size={20} />
             </a>
           </div>
@@ -33,10 +46,10 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-3">Resources</h3>
             <ul className="text-gray-400 text-sm space-y-2">
-              <li><a href="#" className="hover:text-blue-300 transition-colors">Media Literacy Guide</a></li>
-              <li><a href="#" className="hover:text-blue-300 transition-colors">Bias Types Explained</a></li>
-              <li><a href="#" className="hover:text-blue-300 transition-colors">Fact-Checking Resources</a></li>
-              <li><a href="#" className="hover:text-blue-300 transition-colors">API Documentation</a></li>
+              <li><a href="#" onClick={handleNavigation('resources')} className="hover:text-blue-300 transition-colors">Media Literacy Guide</a></li>
+              <li><a href="#" onClick={handleNavigation('resources')} className="hover:text-blue-300 transition-colors">Bias Types Explained</a></li>
+              <li><a href="#" onClick={handleNavigation('resources')} className="hover:text-blue-300 transition-colors">Fact-Checking Resources</a></li>
+              <li><a href="#" onClick={handleNavigation('resources')} className="hover:text-blue-300 transition-colors">API Documentation</a></li>
             </ul>
           </div>
           
