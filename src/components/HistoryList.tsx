@@ -21,9 +21,10 @@ interface HistoryItem {
 
 interface HistoryListProps {
   userId: string;
+  onArticleClick: (article: any) => void;
 }
 
-const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
+const HistoryList: React.FC<HistoryListProps> = ({ userId, onArticleClick }) => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -77,63 +78,75 @@ const HistoryList: React.FC<HistoryListProps> = ({ userId }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="space-y-4">
-        {history.map((item) => (
-          <div 
-            key={item.id} 
-            className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-            onClick={() => item.analysis_results?.[0] && handleViewAnalysis(item.id, item.analysis_results[0].id)}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-semibold text-lg text-gray-800">{item.title}</h3>
-                <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
+    <div className="space-y-4">
+      {history.map((item) => (
+        <div 
+          key={item.id}
+          className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => onArticleClick({
+            id: item.id,
+            article: {
+              title: item.title,
+              content: item.content,
+              source: item.source,
+              date: item.date
+            },
+            analysis_results: item.analysis_results[0] || {
+              overall_bias_score: 0,
+              overall_factual_score: 0,
+              summary: ''
+            },
+            created_at: item.created_at
+          })}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-semibold text-lg text-gray-800">{item.title}</h3>
+              <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
+                <span className="flex items-center">
+                  <Calendar size={14} className="mr-1" />
+                  Analyzed on {formatDate(item.created_at)}
+                </span>
+                {item.source && (
                   <span className="flex items-center">
-                    <Calendar size={14} className="mr-1" />
-                    Analyzed on {formatDate(item.created_at)}
+                    <FileText size={14} className="mr-1" />
+                    {item.source}
                   </span>
-                  {item.source && (
-                    <span className="flex items-center">
-                      <FileText size={14} className="mr-1" />
-                      {item.source}
-                    </span>
-                  )}
-                </div>
+                )}
               </div>
-              <ChevronRight className="text-gray-400" />
             </div>
-            
-            {item.analysis_results && item.analysis_results[0] && (
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500">Bias Score</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                      <div 
-                        className={`h-2 rounded-full ${getBiasColor(item.analysis_results[0].overall_bias_score)}`} 
-                        style={{ width: `${item.analysis_results[0].overall_bias_score * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Factual Score</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                      <div 
-                        className={`h-2 rounded-full ${getFactualColor(item.analysis_results[0].overall_factual_score)}`} 
-                        style={{ width: `${item.analysis_results[0].overall_factual_score * 100}%` }}
-                      ></div>
-                    </div>
+            <ChevronRight className="text-gray-400" />
+          </div>
+          
+          {item.analysis_results && item.analysis_results[0] && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-500">Bias Score</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                    <div 
+                      className={`h-2 rounded-full ${getBiasColor(item.analysis_results[0].overall_bias_score)}`} 
+                      style={{ width: `${item.analysis_results[0].overall_bias_score * 100}%` }}
+                    ></div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-3 line-clamp-2">
-                  {item.analysis_results[0].summary}
-                </p>
+                <div>
+                  <p className="text-xs text-gray-500">Factual Score</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                    <div 
+                      className={`h-2 rounded-full ${getFactualColor(item.analysis_results[0].overall_factual_score)}`} 
+                      style={{ width: `${item.analysis_results[0].overall_factual_score * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              <p className="text-sm text-gray-600 mt-3 line-clamp-2">
+                {item.analysis_results[0].summary}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
