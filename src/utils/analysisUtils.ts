@@ -3,8 +3,8 @@ import { supabase } from '../lib/supabase';
 import axios from 'axios';
 import { analyzeText, TextAnalysis } from './nlpUtils';
 
-const SAPLING_API_KEY = 'UIPYT5RF125U27UGEVYCDFSNW5YV1OIN';
-const CLAIMBUSTER_API_KEY = 'b4cb44e84c314dd4be2aeeba51cf7d9a';
+const SAPLING_API_KEY = import.meta.env.VITE_SAPLING_API_KEY;
+const CLAIMBUSTER_API_KEY = import.meta.env.VITE_CLAIMBUSTER_API_KEY;
 
 // Define reliable source patterns
 const RELIABLE_SOURCES = {
