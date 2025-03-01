@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <div className="flex items-center mb-4 md:mb-0">
             <AlertTriangle size={24} className="mr-2" />
-            <span className="text-xl font-bold">BiasDetector</span>
+            <span className="text-xl font-bold">DeepTrust</span>
           </div>
           
           <div className="flex space-x-4">
@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-3">About</h3>
             <p className="text-gray-400 text-sm">
-              BiasDetector is an AI-powered tool designed to help readers identify potential biases and 
+              DeepTrust is an AI-powered tool designed to help readers identify potential biases and 
               misinformation in news articles, promoting media literacy and critical thinking.
             </p>
           </div>
@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="text-center mt-8 text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} BiasDetector. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} DeepTrust. All rights reserved.</p>
           <p className="mt-1">
             This tool is for educational purposes only. Always verify information from multiple sources.
           </p>
