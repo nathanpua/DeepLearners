@@ -1,15 +1,65 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ArticleInput from './components/ArticleInput';
 import AnalysisResults from './components/AnalysisResults';
 import Auth from './components/Auth';
-import ResourcesPage from './pages/ResourcesPage';
-import FAQPage from './pages/FAQPage';
-import AboutPage from './pages/AboutPage';
+import About from './pages/about';
 import { Article, AnalysisResult } from './types';
 import { analyzeArticle } from './utils/analysisUtils';
 import { supabase } from './lib/supabase';
+
+const MainContent: React.FC<{
+  isAuthenticated: boolean;
+  setIsAuthenticated: (status: boolean) => void;
+  isAnalyzing: boolean;
+  results: AnalysisResult | null;
+  handleAnalyze: (article: Article) => Promise<void>;
+  handleReset: () => void;
+}> = ({ isAuthenticated, setIsAuthenticated, isAnalyzing, results, handleAnalyze, handleReset }) => {
+  return (
+    <>
+      {!isAuthenticated ? (
+        <Auth onAuthChange={setIsAuthenticated} />
+      ) : isAnalyzing ? (
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-lg text-gray-700">Analyzing article for bias and misinformation...</p>
+        </div>
+      ) : results ? (
+        <AnalysisResults results={results} onReset={handleReset} />
+      ) : (
+        <>
+          <div className="max-w-3xl mx-auto mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">How It Works</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">1</div>
+                <h3 className="font-semibold mb-2">Paste Your Article</h3>
+                <p className="text-gray-600 text-sm">Enter the title and content of any news article you want to analyze.</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">2</div>
+                <h3 className="font-semibold mb-2">AI Analysis</h3>
+                <p className="text-gray-600 text-sm">Our algorithm scans for various types of bias and fact-checks key claims.</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">3</div>
+                <h3 className="font-semibold mb-2">Get Results</h3>
+                <p className="text-gray-600 text-sm">Review detailed analysis of potential biases and factual accuracy.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            <ArticleInput onAnalyze={handleAnalyze} />
+          </div>
+        </>
+      )}
+    </>
+  );
+};
 
 function App() {
   const [results, setResults] = useState<AnalysisResult | null>(null);
@@ -17,7 +67,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<string>('home');
 
   useEffect(() => {
     // Check for existing session on load
@@ -71,9 +120,8 @@ function App() {
 
       if (articleError) throw articleError;
 
-      // For demo purposes, we'll still use the mock analysis
-      // In a real app, you might call an external API here
-      const analysisResults = analyzeArticle(article);
+      // Perform the analysis with AI detection
+      const analysisResults = await analyzeArticle(article);
       
       // Save the analysis results
       const { error: analysisError } = await supabase
@@ -110,14 +158,6 @@ function App() {
     setResults(null);
   };
 
-  const navigateTo = (page: string) => {
-    setCurrentPage(page);
-    // Reset analysis results when navigating away from home
-    if (page !== 'home') {
-      setResults(null);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -130,73 +170,27 @@ function App() {
     );
   }
 
-  const renderContent = () => {
-    if (currentPage === 'resources') {
-      return <ResourcesPage />;
-    } else if (currentPage === 'faq') {
-      return <FAQPage />;
-    } else if (currentPage === 'about') {
-      return <AboutPage />;
-    } else {
-      // Home page content
-      if (!isAuthenticated) {
-        return <Auth onAuthChange={(status) => setIsAuthenticated(status)} />;
-      } else if (isAnalyzing) {
-        return (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-lg text-gray-700">Analyzing article for bias and misinformation...</p>
-          </div>
-        );
-      } else if (results) {
-        return <AnalysisResults results={results} onReset={handleReset} />;
-      } else {
-        return (
-          <>
-            <div className="max-w-3xl mx-auto mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">How It Works</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">1</div>
-                  <h3 className="font-semibold mb-2">Paste Your Article</h3>
-                  <p className="text-gray-600 text-sm">Enter the title and content of any news article you want to analyze.</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">2</div>
-                  <h3 className="font-semibold mb-2">AI Analysis</h3>
-                  <p className="text-gray-600 text-sm">Our algorithm scans for various types of bias and fact-checks key claims.</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <div className="bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center mb-3">3</div>
-                  <h3 className="font-semibold mb-2">Get Results</h3>
-                  <p className="text-gray-600 text-sm">Review detailed analysis of potential biases and factual accuracy.</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="max-w-3xl mx-auto">
-              <ArticleInput onAnalyze={handleAnalyze} />
-            </div>
-          </>
-        );
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header 
-        isAuthenticated={isAuthenticated} 
-        onSignOut={handleSignOut} 
-        currentPage={currentPage}
-        onNavigate={navigateTo}
-      />
+      <Header isAuthenticated={isAuthenticated} onSignOut={handleSignOut} />
       
       <main className="container mx-auto px-4 flex-grow">
-        {renderContent()}
+        <Routes>
+          <Route path="/" element={
+            <MainContent 
+              isAuthenticated={isAuthenticated}
+              setIsAuthenticated={setIsAuthenticated}
+              isAnalyzing={isAnalyzing}
+              results={results}
+              handleAnalyze={handleAnalyze}
+              handleReset={handleReset}
+            />
+          } />
+          <Route path="/about" element={<About />} />
+        </Routes>
       </main>
       
-      <Footer onNavigate={navigateTo} />
+      <Footer />
     </div>
   );
 }
