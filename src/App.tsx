@@ -10,6 +10,7 @@ import History from './pages/history';
 import { Article, AnalysisResult } from './types';
 import { analyzeArticle } from './utils/analysisUtils';
 import { supabase } from './lib/supabase';
+import { Analytics } from "@vercel/analytics/react"
 
 const MainContent: React.FC<{
   isAuthenticated: boolean;
@@ -55,6 +56,7 @@ const MainContent: React.FC<{
           
           <div className="max-w-3xl mx-auto">
             <ArticleInput onAnalyze={handleAnalyze} />
+            <Analytics />
           </div>
         </>
       )}
