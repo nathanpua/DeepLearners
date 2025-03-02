@@ -4,6 +4,9 @@ DeepTrust is an AI-powered tool that helps readers identify potential biases and
 
 ## Features
 
+- **AI-Generated Detection**
+  - Using Sapling AI API to detect if the piece of content is human-written, or AI-generated
+
 - **Bias Detection**:
   - Political and ideological bias
   - Emotional manipulation
@@ -22,7 +25,7 @@ DeepTrust is an AI-powered tool that helps readers identify potential biases and
   - Real-time analysis
   - Detailed reports
   - User history tracking
-  - Authentication system
+  - User Authentication system
 
 ## Tech Stack
 
